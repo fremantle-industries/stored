@@ -1,4 +1,5 @@
 # Stored
+[![CircleCI](https://circleci.com/gh/rupurt/stored.svg?style=svg)](https://circleci.com/gh/rupurt/stored)
 
 Store & query records against various backends with a simple lightweight API
 
