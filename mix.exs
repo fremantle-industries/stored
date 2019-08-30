@@ -6,7 +6,9 @@ defmodule Stored.MixProject do
       app: :stored,
       version: "0.0.1",
       elixir: "~> 1.9",
+      package: package(),
       start_permanent: Mix.env() == :prod,
+      description: description(),
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
       dialyzer: [
@@ -27,6 +29,18 @@ defmodule Stored.MixProject do
       {:dialyxir, "~> 1.0.0-rc.6", only: :dev, runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
+  end
+
+  defp description do
+    "Store & query records against various backends with a simple lightweight API"
+  end
+
+  defp package do
+    %{
+      licenses: ["MIT"],
+      maintainers: ["Alex Kwiatkowski"],
+      links: %{"GitHub" => "https://github.com/rupurt/stored"}
+    }
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
