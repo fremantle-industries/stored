@@ -1,4 +1,6 @@
 defmodule Stored.Backends.ETS do
+  @behaviour Stored.Backend
+
   def create(table_name) do
     :ets.new(table_name, [:set, :protected, :named_table])
     :ok

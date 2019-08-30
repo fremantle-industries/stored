@@ -1,7 +1,9 @@
 # Stored
 [![CircleCI](https://circleci.com/gh/rupurt/stored.svg?style=svg)](https://circleci.com/gh/rupurt/stored)
 
-Store & query records against various backends with a simple lightweight API
+Store & query structs against various backends with a simple lightweight API.
+
+By default `stored` ships with an ETS backend. Custom backends can be added by implementing the `Stored.Backend` behaviour.
 
 ## Installation
 
