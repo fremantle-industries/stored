@@ -18,7 +18,23 @@ defmodule Stored.Store do
         backend = Keyword.get(args, :backend, @default_backend)
         name = to_name(id)
         state = %State{id: id, name: name, backend: backend}
+
         GenServer.start_link(__MODULE__, state, name: name)
+      end
+
+      @spec to_name(store_id) :: atom
+      def to_name(store_id), do: :"#{__MODULE__}_#{store_id}"
+
+      def upsert(item, store_id \\ @default_id) do
+        store_id
+        |> to_name
+        |> GenServer.call({:upsert, item})
+      end
+
+      def all(store_id \\ @default_id) do
+        store_id
+        |> to_name
+        |> GenServer.call(:all)
       end
 
       def init(state), do: {:ok, state, {:continue, :init}}
@@ -37,21 +53,6 @@ defmodule Stored.Store do
         response = state.backend.all(state.name)
         {:reply, response, state}
       end
-
-      def upsert(item, store_id \\ @default_id) do
-        store_id
-        |> to_name
-        |> GenServer.call({:upsert, item})
-      end
-
-      def all(store_id \\ @default_id) do
-        store_id
-        |> to_name
-        |> GenServer.call(:all)
-      end
-
-      @spec to_name(store_id) :: atom
-      def to_name(store_id), do: :"#{__MODULE__}_#{store_id}"
     end
   end
 end
