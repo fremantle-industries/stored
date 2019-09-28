@@ -1,7 +1,12 @@
 defmodule Stored.Store do
+  @callback backend_created() :: no_return
+  @optional_callbacks backend_created: 0
+
   defmacro __using__(_) do
     quote location: :keep do
       use GenServer
+
+      @behaviour Stored.Store
 
       @type store_id :: atom
 
@@ -41,6 +46,7 @@ defmodule Stored.Store do
 
       def handle_continue(:init, state) do
         :ok = state.backend.create(state.name)
+        backend_created()
         {:noreply, state}
       end
 
@@ -53,6 +59,10 @@ defmodule Stored.Store do
         response = state.backend.all(state.name)
         {:reply, response, state}
       end
+
+      def backend_created, do: nil
+
+      defoverridable backend_created: 0
     end
   end
 end

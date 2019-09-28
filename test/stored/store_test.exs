@@ -7,11 +7,27 @@ defmodule Stored.StoreTest do
     use Stored.Store
   end
 
+  defmodule TestStoreWithCallbacks do
+    use Stored.Store
+
+    def backend_created do
+      send(Stored.StoreTest, :backend_created)
+    end
+  end
+
   test "can start multiple stores" do
     assert {:ok, pid_a} = TestStore.start_link(id: :"#{@test_store_id}_a")
     assert {:ok, pid_b} = TestStore.start_link(id: :"#{@test_store_id}_b")
     assert :ok = GenServer.stop(pid_a)
     assert :ok = GenServer.stop(pid_b)
+  end
+
+  test "fires the backend_created callback" do
+    Process.register(self(), __MODULE__)
+
+    start_supervised!({TestStoreWithCallbacks, id: @test_store_id})
+
+    assert_receive :backend_created
   end
 
   test "can upsert an item" do
