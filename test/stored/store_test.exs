@@ -44,12 +44,23 @@ defmodule Stored.StoreTest do
     assert u_mj == mj
   end
 
-  test "can get all items" do
+  test "can find an item by key" do
+    start_supervised({TestStore, id: @test_store_id})
     mj = %TestSupport.Person{first_name: "Michael", last_name: "Jordan"}
+    TestStore.upsert(mj, @test_store_id)
+
+    assert {:ok, found_record} = TestStore.find("Michael_Jordan", @test_store_id)
+    assert found_record == mj
+
+    assert TestStore.find("Lebron_James", @test_store_id) == {:error, :not_found}
+  end
+
+  test "can get all items" do
     start_supervised({TestStore, id: @test_store_id})
 
     assert TestStore.all(@test_store_id) == []
 
+    mj = %TestSupport.Person{first_name: "Michael", last_name: "Jordan"}
     assert {:ok, _} = TestStore.upsert(mj, @test_store_id)
 
     assert [u_mj | []] = TestStore.all(@test_store_id)

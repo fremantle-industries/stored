@@ -9,6 +9,8 @@ defmodule Stored.Store do
       @behaviour Stored.Store
 
       @type store_id :: atom
+      @type record :: Stored.Backend.record()
+      @type key :: Stored.Backend.key()
 
       @default_id :default
       @default_backend Stored.Backends.ETS
@@ -36,6 +38,13 @@ defmodule Stored.Store do
         |> GenServer.call({:upsert, item})
       end
 
+      @spec find(key) :: {:ok, record} | {:error, :not_found}
+      def find(key, store_id \\ @default_id) do
+        store_id
+        |> to_name
+        |> GenServer.call({:find, key})
+      end
+
       def all(store_id \\ @default_id) do
         store_id
         |> to_name
@@ -52,6 +61,11 @@ defmodule Stored.Store do
 
       def handle_call({:upsert, item}, _from, state) do
         response = state.backend.upsert(item, state.name)
+        {:reply, response, state}
+      end
+
+      def handle_call({:find, key}, _from, state) do
+        response = state.backend.find(key, state.name)
         {:reply, response, state}
       end
 

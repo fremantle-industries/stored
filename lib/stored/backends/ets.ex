@@ -13,6 +13,18 @@ defmodule Stored.Backends.ETS do
     {:ok, record}
   end
 
+  def find(key, table_name) do
+    table_name
+    |> :ets.lookup(key)
+    |> case do
+      [{_, record} | _] ->
+        {:ok, record}
+
+      [] ->
+        {:error, :not_found}
+    end
+  end
+
   def all(table_name) do
     table_name
     |> :ets.select([{{:_, :_}, [], [:"$_"]}])
