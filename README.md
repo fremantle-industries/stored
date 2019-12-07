@@ -1,5 +1,5 @@
 # Stored
-[![CircleCI](https://circleci.com/gh/rupurt/stored.svg?style=svg)](https://circleci.com/gh/rupurt/stored)
+![](https://github.com/rupurt/stored/workflows/.github/workflows/test.yml/badge.svg)
 
 Store & query structs against various backends with a simple lightweight API.
 
