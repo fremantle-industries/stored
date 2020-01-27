@@ -32,10 +32,16 @@ defmodule Stored.Store do
       @spec to_name(store_id) :: atom
       def to_name(store_id), do: :"#{__MODULE__}_#{store_id}"
 
+      @deprecated "Use Stored.Store.put/2 instead."
       def upsert(item, store_id \\ @default_id) do
+        put(item, store_id)
+      end
+
+      @spec put(struct) :: {:ok, {key, record}}
+      def put(item, store_id \\ @default_id) do
         store_id
         |> to_name
-        |> GenServer.call({:upsert, item})
+        |> GenServer.call({:put, item})
       end
 
       @spec find(key) :: {:ok, record} | {:error, :not_found}
@@ -59,8 +65,8 @@ defmodule Stored.Store do
         {:noreply, state}
       end
 
-      def handle_call({:upsert, item}, _from, state) do
-        response = state.backend.upsert(item, state.name)
+      def handle_call({:put, item}, _from, state) do
+        response = state.backend.put(item, state.name)
         {:reply, response, state}
       end
 

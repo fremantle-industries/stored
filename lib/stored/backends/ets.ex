@@ -6,7 +6,7 @@ defmodule Stored.Backends.ETS do
     :ok
   end
 
-  def upsert(item, table_name) do
+  def put(item, table_name) do
     key = Stored.Item.key(item)
     record = {key, item}
     true = :ets.insert(table_name, record)

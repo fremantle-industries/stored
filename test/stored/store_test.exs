@@ -30,16 +30,16 @@ defmodule Stored.StoreTest do
     assert_receive :backend_created
   end
 
-  test "can upsert an item" do
+  test "can put an item" do
     lebron = %TestSupport.Person{first_name: "Lebron", last_name: "James"}
     mj = %TestSupport.Person{first_name: "Michael", last_name: "Jordan"}
     start_supervised({TestStore, id: @test_store_id})
 
-    assert {:ok, {u_lebron_key, u_lebron}} = TestStore.upsert(lebron, @test_store_id)
+    assert {:ok, {u_lebron_key, u_lebron}} = TestStore.put(lebron, @test_store_id)
     assert u_lebron_key == "Lebron_James"
     assert u_lebron == lebron
 
-    assert {:ok, {u_mj_key, u_mj}} = TestStore.upsert(mj, @test_store_id)
+    assert {:ok, {u_mj_key, u_mj}} = TestStore.put(mj, @test_store_id)
     assert u_mj_key == "Michael_Jordan"
     assert u_mj == mj
   end
@@ -47,7 +47,7 @@ defmodule Stored.StoreTest do
   test "can find an item by key" do
     start_supervised({TestStore, id: @test_store_id})
     mj = %TestSupport.Person{first_name: "Michael", last_name: "Jordan"}
-    TestStore.upsert(mj, @test_store_id)
+    TestStore.put(mj, @test_store_id)
 
     assert {:ok, found_record} = TestStore.find("Michael_Jordan", @test_store_id)
     assert found_record == mj
@@ -61,7 +61,7 @@ defmodule Stored.StoreTest do
     assert TestStore.all(@test_store_id) == []
 
     mj = %TestSupport.Person{first_name: "Michael", last_name: "Jordan"}
-    assert {:ok, _} = TestStore.upsert(mj, @test_store_id)
+    assert {:ok, _} = TestStore.put(mj, @test_store_id)
 
     assert [u_mj | []] = TestStore.all(@test_store_id)
     assert u_mj == mj
