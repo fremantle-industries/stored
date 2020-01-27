@@ -51,6 +51,7 @@ defmodule Stored.Store do
         |> GenServer.call({:find, key})
       end
 
+      @spec all :: [record]
       def all(store_id \\ @default_id) do
         store_id
         |> to_name
