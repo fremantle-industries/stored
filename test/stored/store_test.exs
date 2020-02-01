@@ -82,4 +82,20 @@ defmodule Stored.StoreTest do
     assert [u_mj | []] = TestStore.all(@test_store_id)
     assert u_mj == mj
   end
+
+  describe ".update/2" do
+    @kobe %TestSupport.Person{first_name: "Kobe", last_name: "Bryant", age: 40}
+
+    test "can update attributes on a record" do
+      start_supervised({TestStore, id: @test_store_id})
+
+      assert {:ok, {key, _}} = TestStore.put(@kobe, @test_store_id)
+      assert TestStore.update(key, age: 41) == :ok
+      assert {:ok, record} = TestStore.find(key)
+    end
+
+    test "returns an error when the record doesn't exist" do
+      assert TestStore.update(shaq, %{age: 50}, @test_store_id) == {:error, :not_found}
+    end
+  end
 end

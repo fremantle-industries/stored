@@ -1,5 +1,5 @@
 defmodule TestSupport.Person do
-  defstruct ~w(first_name last_name)a
+  defstruct ~w(first_name last_name age)a
 end
 
 defimpl Stored.Item, for: TestSupport.Person do
