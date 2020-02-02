@@ -10,8 +10,8 @@ defmodule Stored.StoreTest do
   defmodule TestStoreWithCallbacks do
     use Stored.Store
 
-    def backend_created do
-      send(Stored.StoreTest, :backend_created)
+    def after_backend_create do
+      send(Stored.StoreTest, :after_backend_create)
     end
   end
 
@@ -22,12 +22,12 @@ defmodule Stored.StoreTest do
     assert :ok = GenServer.stop(pid_b)
   end
 
-  test "fires the backend_created callback" do
+  test "fires callback 'after_backend_create/0'" do
     Process.register(self(), __MODULE__)
 
     start_supervised!({TestStoreWithCallbacks, id: @test_store_id})
 
-    assert_receive :backend_created
+    assert_receive :after_backend_create
   end
 
   test "can put an item" do

@@ -1,6 +1,7 @@
 defmodule Stored.Store do
   @callback backend_created() :: no_return
-  @optional_callbacks backend_created: 0
+  @callback after_backend_create() :: no_return
+  @optional_callbacks after_backend_create: 0, backend_created: 0
 
   defmacro __using__(_) do
     quote location: :keep do
@@ -62,6 +63,7 @@ defmodule Stored.Store do
 
       def handle_continue(:init, state) do
         :ok = state.backend.create(state.name)
+        after_backend_create()
         backend_created()
         {:noreply, state}
       end
@@ -82,8 +84,9 @@ defmodule Stored.Store do
       end
 
       def backend_created, do: nil
+      def after_backend_create, do: nil
 
-      defoverridable backend_created: 0
+      defoverridable after_backend_create: 0, backend_created: 0
     end
   end
 end
