@@ -37,8 +37,8 @@ end
 
 lebron = %Person{first_name: "Lebron", last_name: "James"}
 
-{:ok, {u_lebron_key_default, u_lebron_default}} = MyStore.upsert(lebron)
-{:ok, {u_lebron_key_a, u_lebron_a}} = MyStore.upsert(lebron, :a)
+{:ok, {r_lebron_key_default, r_lebron_default}} = MyStore.put(lebron)
+{:ok, {r_lebron_key_a, r_lebron_a}} = MyStore.put(lebron, :a)
 
 people_default = MyStore.all()
 people_a = MyStore.all(:a)
