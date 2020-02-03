@@ -1,7 +1,10 @@
 defmodule Stored.Store do
+  @type record :: Stored.Backend.record()
+
   @callback backend_created() :: no_return
   @callback after_backend_create() :: no_return
-  @optional_callbacks after_backend_create: 0, backend_created: 0
+  @callback after_put(record) :: no_return
+  @optional_callbacks after_backend_create: 0, backend_created: 0, after_put: 1
 
   defmacro __using__(_) do
     quote location: :keep do
@@ -34,15 +37,15 @@ defmodule Stored.Store do
       def to_name(store_id), do: :"#{__MODULE__}_#{store_id}"
 
       @deprecated "Use Stored.Store.put/2 instead."
-      def upsert(item, store_id \\ @default_id) do
-        put(item, store_id)
+      def upsert(record, store_id \\ @default_id) do
+        put(record, store_id)
       end
 
-      @spec put(struct) :: {:ok, {key, record}}
-      def put(item, store_id \\ @default_id) do
+      @spec put(record) :: {:ok, {key, record}}
+      def put(record, store_id \\ @default_id) do
         store_id
         |> to_name
-        |> GenServer.call({:put, item})
+        |> GenServer.call({:put, record})
       end
 
       @spec find(key) :: {:ok, record} | {:error, :not_found}
@@ -68,8 +71,9 @@ defmodule Stored.Store do
         {:noreply, state}
       end
 
-      def handle_call({:put, item}, _from, state) do
-        response = state.backend.put(item, state.name)
+      def handle_call({:put, record}, _from, state) do
+        response = state.backend.put(record, state.name)
+        after_put(record)
         {:reply, response, state}
       end
 
@@ -85,8 +89,9 @@ defmodule Stored.Store do
 
       def backend_created, do: nil
       def after_backend_create, do: nil
+      def after_put(record), do: nil
 
-      defoverridable after_backend_create: 0, backend_created: 0
+      defoverridable after_backend_create: 0, backend_created: 0, after_put: 1
     end
   end
 end
