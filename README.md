@@ -9,9 +9,7 @@ By default `stored` ships with an ETS backend. Custom backends can be added by i
 
 ```elixir
 def deps do
-  [
-    {:stored, "~> 0.0.3"}
-  ]
+  [{:stored, "~> 0.0.4"}]
 end
 ```
 
@@ -28,6 +26,9 @@ end
 
 defmodule MyStore do
   use Stored.Store
+
+  def after_backend_create, do: nil
+  def after_put(_record), do: nil
 end
 
 {:ok, pid_default} = MyStore.start_link()
