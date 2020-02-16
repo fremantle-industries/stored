@@ -32,7 +32,7 @@ defmodule Stored.MixProject do
   end
 
   defp description do
-    "Store & query records against various backends with a simple lightweight API"
+    "Store & retrieve structs against various backends with a simple lightweight API."
   end
 
   defp package do
