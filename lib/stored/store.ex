@@ -36,11 +36,6 @@ defmodule Stored.Store do
       @spec to_name(store_id) :: atom
       def to_name(store_id), do: :"#{__MODULE__}_#{store_id}"
 
-      @deprecated "Use Stored.Store.put/2 instead."
-      def upsert(record, store_id \\ @default_id) do
-        put(record, store_id)
-      end
-
       @spec put(record) :: {:ok, {key, record}}
       def put(record, store_id \\ @default_id) do
         store_id
