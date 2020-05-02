@@ -4,7 +4,8 @@ defmodule Stored.Store do
   @callback backend_created() :: no_return
   @callback after_backend_create() :: no_return
   @callback after_put(record) :: no_return
-  @optional_callbacks after_backend_create: 0, backend_created: 0, after_put: 1
+  @callback after_clear() :: no_return
+  @optional_callbacks after_backend_create: 0, backend_created: 0, after_put: 1, after_clear: 0
 
   defmacro __using__(_) do
     quote location: :keep do
@@ -57,6 +58,13 @@ defmodule Stored.Store do
         |> GenServer.call(:all)
       end
 
+      @spec clear :: :ok
+      def clear(store_id \\ @default_id) do
+        store_id
+        |> to_name
+        |> GenServer.call(:clear)
+      end
+
       def init(state), do: {:ok, state, {:continue, :init}}
 
       def handle_continue(:init, state) do
@@ -82,11 +90,18 @@ defmodule Stored.Store do
         {:reply, response, state}
       end
 
+      def handle_call(:clear, _from, state) do
+        response = state.backend.clear(state.name)
+        after_clear()
+        {:reply, response, state}
+      end
+
       def backend_created, do: nil
       def after_backend_create, do: nil
       def after_put(record), do: nil
+      def after_clear, do: nil
 
-      defoverridable after_backend_create: 0, backend_created: 0, after_put: 1
+      defoverridable after_backend_create: 0, backend_created: 0, after_put: 1, after_clear: 0
     end
   end
 end

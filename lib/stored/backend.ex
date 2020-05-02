@@ -7,4 +7,5 @@ defmodule Stored.Backend do
   @callback put(struct, table_name) :: {:ok, {key, record}}
   @callback find(key, table_name) :: {:ok, record} | {:error, :not_found}
   @callback all(table_name) :: [record]
+  @callback clear(table_name) :: :ok
 end

@@ -17,6 +17,10 @@ defmodule Stored.StoreTest do
     def after_put(record) do
       send(Stored.StoreTest, {:after_put, record})
     end
+
+    def after_clear do
+      send(Stored.StoreTest, :after_clear)
+    end
   end
 
   test "can start multiple stores" do
@@ -79,7 +83,34 @@ defmodule Stored.StoreTest do
     mj = %TestSupport.Person{first_name: "Michael", last_name: "Jordan"}
     assert {:ok, _} = TestStore.put(mj, @test_store_id)
 
-    assert [u_mj | []] = TestStore.all(@test_store_id)
-    assert u_mj == mj
+    records = TestStore.all(@test_store_id)
+    assert Enum.count(records) == 1
+    assert Enum.at(records, 0) == mj
+  end
+
+  describe ".clear/0" do
+    test "can clear all records" do
+      start_supervised({TestStore, id: @test_store_id})
+
+      assert TestStore.all(@test_store_id) == []
+
+      mj = %TestSupport.Person{first_name: "Michael", last_name: "Jordan"}
+      assert {:ok, _} = TestStore.put(mj, @test_store_id)
+
+      records = TestStore.all(@test_store_id)
+      assert Enum.count(records) == 1
+
+      assert TestStore.clear(@test_store_id) == :ok
+      records = TestStore.all(@test_store_id)
+      assert Enum.count(records) == 0
+    end
+
+    test "fires callback 'after_clear/0'" do
+      Process.register(self(), @test_store_id)
+      start_supervised!({TestStoreWithCallbacks, id: @test_store_id})
+
+      assert TestStoreWithCallbacks.clear(@test_store_id) == :ok
+      assert_receive :after_clear
+    end
   end
 end
