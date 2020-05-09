@@ -4,8 +4,13 @@ defmodule Stored.Store do
   @callback backend_created() :: no_return
   @callback after_backend_create() :: no_return
   @callback after_put(record) :: no_return
+  @callback after_delete(record) :: no_return
   @callback after_clear() :: no_return
-  @optional_callbacks after_backend_create: 0, backend_created: 0, after_put: 1, after_clear: 0
+  @optional_callbacks after_backend_create: 0,
+                      backend_created: 0,
+                      after_put: 1,
+                      after_delete: 1,
+                      after_clear: 0
 
   defmacro __using__(opts \\ []) do
     quote bind_quoted: [opts: opts], location: :keep do
@@ -62,6 +67,13 @@ defmodule Stored.Store do
         |> GenServer.call(:all)
       end
 
+      @spec delete(record | term) :: :ok
+      def delete(record_or_key, store_id \\ @default_id) do
+        store_id
+        |> process_name
+        |> GenServer.call({:delete, record_or_key})
+      end
+
       @spec clear :: :ok
       def clear(store_id \\ @default_id) do
         store_id
@@ -94,6 +106,12 @@ defmodule Stored.Store do
         {:reply, response, state}
       end
 
+      def handle_call({:delete, record_or_key}, _from, state) do
+        {:ok, key} = response = delete_by_record_or_key(record_or_key, state.name)
+        after_delete(key)
+        {:reply, response, state}
+      end
+
       def handle_call(:clear, _from, state) do
         response = @backend.clear(state.name)
         after_clear()
@@ -103,9 +121,25 @@ defmodule Stored.Store do
       def backend_created, do: nil
       def after_backend_create, do: nil
       def after_put(record), do: nil
+      def after_delete(record), do: nil
       def after_clear, do: nil
 
-      defoverridable after_backend_create: 0, backend_created: 0, after_put: 1, after_clear: 0
+      defoverridable after_backend_create: 0,
+                     backend_created: 0,
+                     after_put: 1,
+                     after_delete: 1,
+                     after_clear: 0
+
+      defp delete_by_record_or_key(record, name) when is_struct(record) do
+        record
+        |> Stored.Item.key()
+        |> delete_by_record_or_key(name)
+      end
+
+      defp delete_by_record_or_key(key, name) do
+        :ok = @backend.delete(key, name)
+        {:ok, key}
+      end
     end
   end
 end

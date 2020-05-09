@@ -7,11 +7,15 @@ defmodule Stored.Backends.ETSTest do
     use Stored.Store, backend: Stored.Backends.ETS
   end
 
+  setup do
+    start_supervised({TestStore, id: @test_store_id})
+    :ok
+  end
+
   describe ".put/1" do
     test "can inject a record into the backend" do
       process_name = TestStore.process_name(@test_store_id)
       mj = %TestSupport.Person{first_name: "Michael", last_name: "Jordan"}
-      start_supervised({TestStore, id: @test_store_id})
 
       assert {:ok, _} = TestStore.put(mj, @test_store_id)
 
@@ -31,7 +35,6 @@ defmodule Stored.Backends.ETSTest do
   end
 
   test "can find a record by key" do
-    start_supervised({TestStore, id: @test_store_id})
     mj = %TestSupport.Person{first_name: "Michael", last_name: "Jordan"}
     TestStore.put(mj, @test_store_id)
 
@@ -42,8 +45,6 @@ defmodule Stored.Backends.ETSTest do
   end
 
   test "can get all records" do
-    start_supervised({TestStore, id: @test_store_id})
-
     assert TestStore.all(@test_store_id) == []
 
     mj = %TestSupport.Person{first_name: "Michael", last_name: "Jordan"}
@@ -54,9 +55,28 @@ defmodule Stored.Backends.ETSTest do
     assert Enum.at(records, 0) == mj
   end
 
-  test "can clear all records" do
-    start_supervised({TestStore, id: @test_store_id})
+  describe ".delete/1" do
+    @mj %TestSupport.Person{first_name: "Michael", last_name: "Jordan"}
 
+    setup do
+      TestStore.put(@mj, @test_store_id)
+
+      assert {:ok, _} = TestStore.find("Michael_Jordan", @test_store_id)
+      :ok
+    end
+
+    test "can delete by struct" do
+      assert {:ok, "Michael_Jordan"} = TestStore.delete(@mj, @test_store_id)
+      assert TestStore.find("Michael_Jordan", @test_store_id) == {:error, :not_found}
+    end
+
+    test "can delete by key" do
+      assert {:ok, "Michael_Jordan"} = TestStore.delete("Michael_Jordan", @test_store_id)
+      assert TestStore.find("Michael_Jordan", @test_store_id) == {:error, :not_found}
+    end
+  end
+
+  test "can clear all records" do
     assert TestStore.all(@test_store_id) == []
 
     mj = %TestSupport.Person{first_name: "Michael", last_name: "Jordan"}

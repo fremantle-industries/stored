@@ -14,6 +14,10 @@ defmodule Stored.StoreTest do
       send(Stored.StoreTest, {:after_put, record})
     end
 
+    def after_delete(record) do
+      send(Stored.StoreTest, {:after_delete, record})
+    end
+
     def after_clear do
       send(Stored.StoreTest, :after_clear)
     end
@@ -44,6 +48,19 @@ defmodule Stored.StoreTest do
 
     assert {:ok, {u_lebron_key, u_lebron}} = TestStore.put(lebron, @test_store_id)
     assert_receive {:after_put, put_record}
+  end
+
+  test ".delete/1 fires callback 'after_delete/1'" do
+    start_supervised!({TestStore, id: @test_store_id})
+
+    lebron = %TestSupport.Person{first_name: "Lebron", last_name: "James"}
+
+    assert {:ok, _} = TestStore.put(lebron, @test_store_id)
+    assert_receive {:after_put, _}
+
+    assert {:ok, _} = TestStore.delete(lebron, @test_store_id)
+    assert_receive {:after_delete, deleted_key}
+    assert deleted_key == "Lebron_James"
   end
 
   test ".clear/0 fires callback 'after_clear/0'" do

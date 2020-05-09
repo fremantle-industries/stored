@@ -31,6 +31,11 @@ defmodule Stored.Backends.ETS do
     |> Enum.map(fn {_, item} -> item end)
   end
 
+  def delete(key, table_name) do
+    true = :ets.delete(table_name, key)
+    :ok
+  end
+
   def clear(table_name) do
     true = :ets.delete_all_objects(table_name)
     :ok
