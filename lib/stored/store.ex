@@ -28,40 +28,45 @@ defmodule Stored.Store do
       def start_link(args) do
         id = Keyword.get(args, :id, @default_id)
         backend = Keyword.get(args, :backend, @default_backend)
-        name = to_name(id)
+        name = process_name(id)
         state = %State{id: id, name: name, backend: backend}
 
         GenServer.start_link(__MODULE__, state, name: name)
       end
 
+      @spec process_name(store_id) :: atom
+      def process_name(store_id), do: :"#{__MODULE__}_#{store_id}"
+
+      @since "0.0.6"
+      @deprecated "Use Stored.Store.process_name/1 instead"
       @spec to_name(store_id) :: atom
-      def to_name(store_id), do: :"#{__MODULE__}_#{store_id}"
+      def to_name(store_id), do: process_name(store_id)
 
       @spec put(record) :: {:ok, {key, record}}
       def put(record, store_id \\ @default_id) do
         store_id
-        |> to_name
+        |> process_name
         |> GenServer.call({:put, record})
       end
 
       @spec find(key) :: {:ok, record} | {:error, :not_found}
       def find(key, store_id \\ @default_id) do
         store_id
-        |> to_name
+        |> process_name
         |> GenServer.call({:find, key})
       end
 
       @spec all :: [record]
       def all(store_id \\ @default_id) do
         store_id
-        |> to_name
+        |> process_name
         |> GenServer.call(:all)
       end
 
       @spec clear :: :ok
       def clear(store_id \\ @default_id) do
         store_id
-        |> to_name
+        |> process_name
         |> GenServer.call(:clear)
       end
 
