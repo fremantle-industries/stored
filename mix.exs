@@ -4,7 +4,7 @@ defmodule Stored.MixProject do
   def project do
     [
       app: :stored,
-      version: "0.0.5",
+      version: "0.0.6",
       elixir: "~> 1.10",
       package: package(),
       start_permanent: Mix.env() == :prod,
