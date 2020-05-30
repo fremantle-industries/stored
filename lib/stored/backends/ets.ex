@@ -36,6 +36,12 @@ defmodule Stored.Backends.ETS do
     :ok
   end
 
+  def count(table_name) do
+    table_name
+    |> :ets.info()
+    |> Keyword.fetch!(:size)
+  end
+
   def clear(table_name) do
     true = :ets.delete_all_objects(table_name)
     :ok

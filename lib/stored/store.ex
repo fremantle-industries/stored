@@ -74,6 +74,13 @@ defmodule Stored.Store do
         |> GenServer.call({:delete, record_or_key})
       end
 
+      @spec count :: non_neg_integer
+      def count(store_id \\ @default_id) do
+        store_id
+        |> process_name
+        |> GenServer.call(:count)
+      end
+
       @spec clear :: :ok
       def clear(store_id \\ @default_id) do
         store_id
@@ -109,6 +116,11 @@ defmodule Stored.Store do
       def handle_call({:delete, record_or_key}, _from, state) do
         {:ok, key} = response = delete_by_record_or_key(record_or_key, state.name)
         after_delete(key)
+        {:reply, response, state}
+      end
+
+      def handle_call(:count, _from, state) do
+        response = @backend.count(state.name)
         {:reply, response, state}
       end
 
