@@ -130,7 +130,7 @@ defmodule Stored.Store do
                      after_delete: 1,
                      after_clear: 0
 
-      defp delete_by_record_or_key(record, name) when is_struct(record) do
+      defp delete_by_record_or_key(%_{} = record, name) do
         record
         |> Stored.Item.key()
         |> delete_by_record_or_key(name)
