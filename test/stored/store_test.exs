@@ -46,8 +46,8 @@ defmodule Stored.StoreTest do
 
     lebron = %TestSupport.Person{first_name: "Lebron", last_name: "James"}
 
-    assert {:ok, {u_lebron_key, u_lebron}} = TestStore.put(lebron, @test_store_id)
-    assert_receive {:after_put, put_record}
+    assert {:ok, {_u_lebron_key, _u_lebron}} = TestStore.put(lebron, @test_store_id)
+    assert_receive {:after_put, _put_record}
   end
 
   test ".delete/1 fires callback 'after_delete/1'" do
