@@ -67,7 +67,7 @@ defmodule Stored.Store do
         |> GenServer.call(:all)
       end
 
-      @spec delete(record | term) :: :ok
+      @spec delete(record | term) :: {:ok, key}
       def delete(record_or_key, store_id \\ @default_id) do
         store_id
         |> process_name
