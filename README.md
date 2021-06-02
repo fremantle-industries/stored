@@ -1,6 +1,6 @@
 # Stored
 
-[![Build Status](https://github.com/rupurt/stored/workflows/test/badge.svg?branch=master)](https://github.com/rupurt/stored/actions?query=workflow%3Atest)
+[![Build Status](https://github.com/rupurt/stored/workflows/test/badge.svg?branch=main)](https://github.com/rupurt/stored/actions?query=workflow%3Atest)
 [![hex.pm version](https://img.shields.io/hexpm/v/stored.svg?style=flat)](https://hex.pm/packages/stored)
 
 Store & retrieve structs against various backends with a simple lightweight API.
