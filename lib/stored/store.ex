@@ -41,11 +41,6 @@ defmodule Stored.Store do
       @spec process_name(store_id) :: atom
       def process_name(store_id), do: :"#{__MODULE__}_#{store_id}"
 
-      @since "0.0.6"
-      @deprecated "Use Stored.Store.process_name/1 instead"
-      @spec to_name(store_id) :: atom
-      def to_name(store_id), do: process_name(store_id)
-
       @spec put(record) :: {:ok, {key, record}}
       def put(record, store_id \\ @default_id) do
         store_id
