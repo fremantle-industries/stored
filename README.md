@@ -11,7 +11,9 @@ By default `stored` ships with an ETS backend. Custom backends can be added by i
 
 ```elixir
 def deps do
-  [{:stored, "~> 0.0.7"}]
+  [
+    {:stored, "~> 0.0.8"}
+  ]
 end
 ```
 
