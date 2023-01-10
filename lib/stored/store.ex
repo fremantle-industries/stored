@@ -55,11 +55,23 @@ defmodule Stored.Store do
         |> GenServer.call({:find, key})
       end
 
+      @spec client_find(key) :: {:ok, record} | {:error, :not_found}
+      def client_find(key, store_id \\ @default_id) do
+        name = process_name(store_id)
+        @backend.find(key, name)
+      end
+
       @spec all :: [record]
       def all(store_id \\ @default_id) do
         store_id
         |> process_name
         |> GenServer.call(:all)
+      end
+
+      @spec client_all :: [record]
+      def client_all(store_id \\ @default_id) do
+        name = process_name(store_id)
+        @backend.all(name)
       end
 
       @spec delete(record | term) :: {:ok, key}
@@ -74,6 +86,12 @@ defmodule Stored.Store do
         store_id
         |> process_name
         |> GenServer.call(:count)
+      end
+
+      @spec client_count :: non_neg_integer
+      def client_count(store_id \\ @default_id) do
+        name = process_name(store_id)
+        @backend.count(name)
       end
 
       @spec clear :: :ok
